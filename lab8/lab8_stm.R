@@ -1,8 +1,11 @@
 # clear all
+install.packages("quanteda")
+
 rm(list = ls()) 
 library(quanteda)
 library(tidyverse)
 library(RColorBrewer)
+library(stm)
 
 setwd("~/Dropbox/coursework/2018Spring/soc220_spring2018/Github_labs/lab8")
 
@@ -37,7 +40,6 @@ texts_stm <- convert(trim_doc_freq_matrix, to = 'stm')
 
 #plot removed of how many words by minimal threshold count
 plotRemoved(texts_stm$documents,lower.thresh = seq(1, 50, by = 1))
-
 
 #``````````````
 #` prep documents object which takes three arguments:
@@ -105,7 +107,7 @@ plot(fit_stm, type="hist")
 
 par(mfrow = c(1,2))
 plot(fit_stm, type = 'labels', topics = c(2, 4:5), labeltype = 'frex', main = 'FREX')
-plot(fit_stm, type = 'labels', topics = c(2, 4:5), labeltype = 'score', main = 'score')
+plot(fit_stm, type = 'labels', topics = c(2, 2:3), labeltype = 'score', main = 'score')
 
 par(mfrow = c(1,1))
 plot(fit_stm, type = 'perspectives',topics = c(1,2))
@@ -159,6 +161,6 @@ est_stm2 <- estimateEffect(1:10 ~ war + monarch,
 summary(est_stm2)
 
 #plot the estimate, choose covariate to especially examine
-plot(est_stm2, covariate = 'war', model = fit_stm_model1)
+plot(est_stm2, topics=2:3,covariate = 'war', model = fit_stm_model1)
 
 
