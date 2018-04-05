@@ -1,5 +1,9 @@
 # clear all
-install.packages("quanteda")
+install.packages("rtools")
+install.packages("quanteda", dependencies=TRUE)
+install.packages("stm", dependencies=TRUE)
+installed.packages("tidyverse", dependencies=TRUE)
+installed.packages("RColorBrewer", dependencies=TRUE)
 
 rm(list = ls()) 
 library(quanteda)
