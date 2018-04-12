@@ -36,14 +36,21 @@ doc_freq_matrix <- dfm(corpus_object,
            remove_punct = TRUE,
            remove_symbols = TRUE)
 
+
+#plot removed of how many words by minimal threshold count
+plotRemoved(texts_stm$documents,lower.thresh = seq(1, 50, by = 1))
+
 # lastly, trim that matrix to remove uncommon or too common words
 trim_doc_freq_matrix <- dfm_trim(doc_freq_matrix, max_docfreq=.90, min_docfreq = .2)
 
 #structural topic model object from trimmed dtm
 texts_stm <- convert(trim_doc_freq_matrix, to = 'stm')
 
-#plot removed of how many words by minimal threshold count
-plotRemoved(texts_stm$documents,lower.thresh = seq(1, 50, by = 1))
+texts_stm$documents
+texts_stm$vocab
+texts_stm$meta
+
+
 
 #``````````````
 #` prep documents object which takes three arguments:
@@ -62,7 +69,7 @@ prep_docs_object <- prepDocuments(texts_stm$documents, texts_stm$vocab,
 #`Takes in documents, vocab from structural topic object
 #plots log-likelihood
 ntopics <- searchK(texts_stm$documents,texts_stm$vocab, 
-                   K = c(3,5,7), data = texts_stm$meta)
+                   K = c(3,7,12,20), data = texts_stm$meta)
 plot(ntopics)
 
 #######################################################################################
@@ -71,13 +78,12 @@ plot(ntopics)
 #fit stm, FINALLY!
 fit_stm <- stm(documents = texts_stm$documents, 
                vocab = texts_stm$vocab,
-               K = 10,
+               K = 12,
                #covariates
                prevalence = ~ monarch + war, 
                seed = 02138,
                data = texts_stm$meta
 )
-
 
 summary(fit_stm)
 
@@ -134,7 +140,7 @@ plot(topic_corr)
 #which topics are predicted by war
 est_stm <- estimateEffect( ~ war, fit_stm, metadata = texts_stm$meta)
 summary(est_stm)
-plot(est_stm, covariate = 'war', topics = 5:6, model = fit_stm)
+plot(est_stm, covariate = 'war', topics = 1:9, model = fit_stm)
 
 #######################################################################################
 #######################################################################################
