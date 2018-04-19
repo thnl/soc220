@@ -1,9 +1,9 @@
 # clear all
-install.packages("rtools")
-install.packages("quanteda", dependencies=TRUE)
+#install.packages("rtools")
+install.packages("quanteda")
 install.packages("stm", dependencies=TRUE)
-installed.packages("tidyverse", dependencies=TRUE)
-installed.packages("RColorBrewer", dependencies=TRUE)
+installed.packages("tidyverse")
+#installed.packages("RColorBrewer")
 
 rm(list = ls()) 
 library(quanteda)
@@ -37,19 +37,13 @@ doc_freq_matrix <- dfm(corpus_object,
            remove_symbols = TRUE)
 
 
-#plot removed of how many words by minimal threshold count
-plotRemoved(texts_stm$documents,lower.thresh = seq(1, 50, by = 1))
-
+#
+trim_doc_freq_matrix <- dfm_trim(doc_freq_matrix, max_docfreq=70, min_docfreq = 2)
 # lastly, trim that matrix to remove uncommon or too common words
-trim_doc_freq_matrix <- dfm_trim(doc_freq_matrix, max_docfreq=.90, min_docfreq = .2)
+#trim_doc_freq_matrix <- dfm_trim(doc_freq_matrix, max_docfreq=.90, min_docfreq = 2)
 
 #structural topic model object from trimmed dtm
 texts_stm <- convert(trim_doc_freq_matrix, to = 'stm')
-
-texts_stm$documents
-texts_stm$vocab
-texts_stm$meta
-
 
 
 #``````````````
@@ -60,7 +54,15 @@ texts_stm$meta
 #`4. lastly has another threshold if you wish to remove based on plot removed
 #````
 prep_docs_object <- prepDocuments(texts_stm$documents, texts_stm$vocab,
-                           texts_stm$meta, lower.thresh = 10)
+                           texts_stm$meta, lower.thresh = 10, verbose=TRUE)
+
+
+#plot removed of how many words by minimal threshold count
+plotRemoved(texts_stm$documents,lower.thresh = seq(1, 50, by = 1))
+
+texts_stm$documents
+texts_stm$vocab
+texts_stm$meta
 
 #######################################################################################
 #' search for optimal number of topics
@@ -78,7 +80,7 @@ plot(ntopics)
 #fit stm, FINALLY!
 fit_stm <- stm(documents = texts_stm$documents, 
                vocab = texts_stm$vocab,
-               K = 12,
+               K = 7,
                #covariates
                prevalence = ~ monarch + war, 
                seed = 02138,
@@ -140,7 +142,7 @@ plot(topic_corr)
 #which topics are predicted by war
 est_stm <- estimateEffect( ~ war, fit_stm, metadata = texts_stm$meta)
 summary(est_stm)
-plot(est_stm, covariate = 'war', topics = 1:9, model = fit_stm)
+plot(est_stm, covariate = 'war', topics = 1:7, model = fit_stm)
 
 #######################################################################################
 #######################################################################################
@@ -161,7 +163,7 @@ efrSelectModel <- selectModel(texts_stm$documents,
 plotModels(efrSelectModel)
 
 # Choose model #1
-fit_stm_model1 <- efrSelectModel$runout[[1]] 
+fit_stm_model1 <- efrSelectModel$runout[[4]] 
 
 #takes in formula, fit model, metadata
 est_stm2 <- estimateEffect(1:10 ~ war + monarch, 
@@ -171,6 +173,6 @@ est_stm2 <- estimateEffect(1:10 ~ war + monarch,
 summary(est_stm2)
 
 #plot the estimate, choose covariate to especially examine
-plot(est_stm2, topics=2:3,covariate = 'war', model = fit_stm_model1)
+plot(est_stm2, topics=2:3,covariate = 'monarch', model = fit_stm_model1)
 
 
